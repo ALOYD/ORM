@@ -244,6 +244,7 @@ tdicts = ad.create_tables_dict('User')
 t = ad.create_tables()
 w = ad.main_table_dict()
 m = ad.merges()
+w[0].update({'data':ad.data,'json':ad.json})
 
 for i in w:
     for key,attr in i['cols'].items():
@@ -253,14 +254,38 @@ for i in w:
 
 
     for key,attr in i['rels'].items():
-       setattr(i['table'],str(key),relationship(ad.data[key],back_populates=str(i['table'].__name__.lower()),cascade="all, delete, delete-orphan"))
-       setattr(ad.data[key],str(i['table'].__name__.lower()) ,relationship(str(i['table'].__name__.capitalize()), back_populates=str(key)))
-       setattr(ad.data[key],str(i['table'].__name__.lower())+'_id',  Column(Integer, ForeignKey(str(i['table'].__name__.capitalize())+'.id'), nullable=False))
+       setattr(i['table'],str(key),relationship(i['data'][key],back_populates=str(i['table'].__name__.lower()),cascade="all, delete, delete-orphan"))
+       setattr(i['data'][key],str(i['table'].__name__.lower()) ,relationship(str(i['table'].__name__.capitalize()), back_populates=str(key)))
+       setattr(i['data'][key],str(i['table'].__name__.lower())+'_id',  Column(Integer, ForeignKey(str(i['table'].__name__.capitalize())+'.id'), nullable=False))
        
-#       if isinstance(ad.json[key],dict):
-#           nad = Inthago_dev(ad.json[key])
+#       if isinstance(i['json'][key],dict):
+#           nad = Inthago_dev(i['json'][key])
 #           nad.create_tables_dict(str(key.capitalize()))
 #           nad.create_tables()
 #           w.append(nad.main_table_dict())
+
+
+def main_table_dict(data,json):
+    types={"<class 'str'>":"String","<class 'int'>":"Integer"}
+    obj = set(data) - set(json)
+    obj =  data.get(list(obj)[0])
+    backpop = str(list(set(data) - set(json))[0])
+    backpop =obj.__name__.lower()
+    val_cols = list(set(json) - set(data))#Columns
+    cols = []
+    cols = {}
+    for i in val_cols:
+        cols.update({i:types[str(type(i))]})
+        if isinstance(i,list):
+             if (len(i)<=1):
+                 cols.update({i})
+    val_rels = list(set(json) - set(val_cols))
+    rels = {}
+    for i in val_rels:
+        print(backpop.lower())
+        rels.update({i:relationship('"'+str(i)+'"',back_populates="'"+backpop.lower()+"'",cascade="all, delete, delete-orphan")})
+        rels.update({i:'mock'})
+    res =[{"table":obj,"cols":cols,"rels":rels}]
+    return res
 #       
 #       
