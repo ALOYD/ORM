@@ -44,10 +44,10 @@ session = Session()
 
 ##########################GEn classes###################
 
-########################Inthago################################### 
+########################Inthago###################################
 class Inthago_dev(object):
-    
-    
+
+
     def __init__(self,json):
          self.json = json
          self.data = {}
@@ -55,7 +55,7 @@ class Inthago_dev(object):
          self.vals=[]
          self.d={}
          self.types={"<class 'str'>":"String","<class 'int'>":"Integer"}
-    
+
     def create_tables_dict(self,main_table_name):
       create_classes={}
       self.main_table_name = main_table_name
@@ -66,10 +66,10 @@ class Inthago_dev(object):
       print(create_classes,'\n',main_table,'\n')
       for key,value in self.json.items():
          print('adhasjkhdashdasl!!!!!!!!!',value,type(value),self.same_type(value))
-         types = self.same_type(value) 
+         types = self.same_type(value)
          ll = []
          if isinstance( types,type):
-             
+
              ll.append(types)
              types = ll
          else:
@@ -81,7 +81,7 @@ class Inthago_dev(object):
              print(create_classes,'\n',rest_tables,'\n')
 
       self.data.update(create_classes)
-      
+
 
     def main_table_dict(self):
 #        types={"<class 'str'>":"String","<class 'int'>":"Integer"}
@@ -107,12 +107,12 @@ class Inthago_dev(object):
     #res = [{obj:vals}]
         res =[{"table":obj,"cols":cols,"rels":rels}]
         return res
-    
+
     def create_tables(self):
         table_dict=globals().update(self.data)
         return table_dict
-    
-    
+
+
     def merges(self):
         d1 = self.data
         d2 = self.json
@@ -122,10 +122,10 @@ class Inthago_dev(object):
                 merged.update({v:d2[k]})
             except KeyError:
                 pass
-        return merged    
-    
+        return merged
+
     def sign_skel(self,l):
-        
+
         for k,v in l.items():
             i=0
             self.d.update({k:{}})
@@ -148,9 +148,9 @@ class Inthago_dev(object):
                # print (d[k], ' this is d[k]')
 #                    print ({key:listval},' this is {key:listval}')
                     self.d[k].update({key_l:type(listval)})
-        return self.d 
-    
-    
+        return self.d
+
+
     def max_depth(self,iter_obj,ii,di):
 
          list_arr = []
@@ -165,39 +165,48 @@ class Inthago_dev(object):
                          print(element,i)
 
          if (len(list_arr)>0):
-       # ii += 1  
-             di.append({ii:list_arr})      
+       # ii += 1
+             di.append({ii:list_arr})
              return self.max_depth(list_arr,ii,di)
          else:
              di.append({ii:list_arr})
-             return di[-1]    
-        
+             return di[-1]
+
 
     def same_type(self,iterobj):
         if isinstance(iterobj,list):
             iseq = iter(iterobj)
             if (len(iterobj)==0):
                 return type('string')
-            elif (len(iterobj)==1): 
+            elif (len(iterobj)==1):
                 first_type = type(iterobj[0])
                 return first_type
-            else:    
+            else:
                 first_type = type(next(iseq))
                 return first_type if all( (type(x) is first_type) for x in iseq ) else set(type(x) for x in iterobj)
         if isinstance(iterobj,dict):
-            pass
+            iseq = iter(iterobj.values())
+            if (len(iterobj)==0):
+                return type('string')
+            elif (len(iterobj)==1):
+                first_type = type(iterobj[0])
+                return first_type
+            else:
+                first_type = type(next(iseq))
+                return first_type if all( (type(x) is first_type) for x in iseq ) else set(type(x) for x in iterobj)
+
 
     def __len__(self):
         return len(self.coordinate_row)
-        
-        
+
+
     def rest_tables_dict(self,merged):
         depth=[]
         future_dict=[]
         for k,v in merged.items():
             if isinstance(v,list):
                 if (list(self.max_depth(v,0,depth).keys())[0]>0):
-                
+
                     future_dict.append({k:self.sign_skel(v)})
                 else:
                     if (len(v)>1):
@@ -215,11 +224,11 @@ class Inthago_dev(object):
                         future_dict.append({k:v})
             if isinstance(v,dict):
                 pass
-        return future_dict                          
-                                
-                            
-                            
-    
+        return future_dict
+
+
+
+
     def add_cols(self,obj_dict):
         for k,v in obj_dict.items():
             for i in v:
@@ -257,35 +266,100 @@ for i in w:
        setattr(i['table'],str(key),relationship(i['data'][key],back_populates=str(i['table'].__name__.lower()),cascade="all, delete, delete-orphan"))
        setattr(i['data'][key],str(i['table'].__name__.lower()) ,relationship(str(i['table'].__name__.capitalize()), back_populates=str(key)))
        setattr(i['data'][key],str(i['table'].__name__.lower())+'_id',  Column(Integer, ForeignKey(str(i['table'].__name__.capitalize())+'.id'), nullable=False))
-       
+
 #       if isinstance(i['json'][key],dict):
 #           nad = Inthago_dev(i['json'][key])
 #           nad.create_tables_dict(str(key.capitalize()))
 #           nad.create_tables()
 #           w.append(nad.main_table_dict())
 
+#
+# def main_table_dict(data,json):
+#     types={"<class 'str'>":"String","<class 'int'>":"Integer"}
+#     obj = set(data) - set(json)
+#     obj =  data.get(list(obj)[0])
+#     backpop = str(list(set(data) - set(json))[0])
+#     backpop =obj.__name__.lower()
+#     val_cols = list(set(json) - set(data))  #Columns
+#     cols = []
+#     cols = {}
+#     for i in val_cols:
+#         cols.update({i:types[str(type(i))]})
+#         if isinstance(i,list):
+#              if (len(i)<=1):
+#                  cols.update({i})
+#     val_rels = list(set(json) - set(val_cols))
+#     rels = {}
+#     for i in val_rels:
+#         print(backpop.lower())
+#         rels.update({i:relationship('"'+str(i)+'"',back_populates="'"+backpop.lower()+"'",cascade="all, delete, delete-orphan")})
+#         rels.update({i:'mock'})
+#     res =[{"table":obj,"cols":cols,"rels":rels}]
+#     return res
+# #
+# #
 
-def main_table_dict(data,json):
-    types={"<class 'str'>":"String","<class 'int'>":"Integer"}
-    obj = set(data) - set(json)
-    obj =  data.get(list(obj)[0])
-    backpop = str(list(set(data) - set(json))[0])
-    backpop =obj.__name__.lower()
-    val_cols = list(set(json) - set(data))#Columns
-    cols = []
-    cols = {}
-    for i in val_cols:
-        cols.update({i:types[str(type(i))]})
-        if isinstance(i,list):
-             if (len(i)<=1):
-                 cols.update({i})
-    val_rels = list(set(json) - set(val_cols))
-    rels = {}
-    for i in val_rels:
-        print(backpop.lower())
-        rels.update({i:relationship('"'+str(i)+'"',back_populates="'"+backpop.lower()+"'",cascade="all, delete, delete-orphan")})
-        rels.update({i:'mock'})
-    res =[{"table":obj,"cols":cols,"rels":rels}]
-    return res
-#       
-#       
+def same_type(iterobj):
+    if isinstance(iterobj,list):
+        iseq = iter(iterobj)
+        if (len(iterobj)==0):
+            return type('string')
+        elif (len(iterobj)==1):
+            first_type = type(iterobj[0])
+            return first_type
+        else:
+            first_type = type(next(iseq))
+            return first_type if all( (type(x) is first_type) for x in iseq ) else set(type(x) for x in iterobj)
+    if isinstance(iterobj,dict):
+        iseq = iter(iterobj.values())
+        if (len(iterobj)==0):
+            return type('string')
+        elif (len(iterobj)==1):
+            first_type = type(iterobj[0])
+            return first_type
+        else:
+            first_type = type(next(iseq))
+            return first_type if all( (type(x) is first_type) for x in iseq ) else set(type(x) for x in iterobj)
+
+
+def create_tables_dict(data,json ,main_table_name):
+    create_classes = {}
+    main_table_name = main_table_name
+    main_table = str(main_table_name).capitalize()
+    #      attr_dict = {'__tablename__':main_table.lower(),'id': Column(Integer, primary_key=True), '__table_args__':{'extend_existing': True} }
+    attr_dict = {'__tablename__': main_table.capitalize(), 'id': Column(Integer, primary_key=True),
+                 '__table_args__': {'extend_existing': True}}
+    create_classes[main_table] = type('%s' % main_table, (Bases,), attr_dict)
+    print(create_classes, '\n', main_table, '\n')
+    for key, value in json.items():
+        print('adhasjkhdashdasl!!!!!!!!!', value, type(value), same_type(value))
+        types = same_type(value)
+        ll = []
+        if isinstance(types, type):
+
+            ll.append(types)
+            types = ll
+        else:
+            types = types
+#        if ((isinstance(value, list) and any((list, dict in types))) or isinstance(value, dict)):
+        if (isinstance(value, list) and any((list, dict in types))):    
+            rest_tables = str(key)
+            attr_dict = {'__tablename__': rest_tables.capitalize(), 'id': Column(Integer, primary_key=True)}
+            create_classes[rest_tables] = type('%s' % rest_tables.capitalize(), (Bases,), attr_dict)
+            print(create_classes, '\n', rest_tables, '\n')
+#        elif(isinstance(value, dict) and any((list, dict in types))):
+#            if (same_type(value.values()) and len (value.values()) > 1  ):
+                
+
+    data.update(create_classes)
+    
+for key, value in u.items():
+    print('adhasjkhdashdasl!!!!!!!!!', value, type(value), same_type(value))
+    types = same_type(value)
+    ll = {}
+    if isinstance(types, type):
+
+        ll.update({key:types})
+        types = ll
+    else:
+        types = types
