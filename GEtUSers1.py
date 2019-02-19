@@ -347,19 +347,95 @@ def create_tables_dict(data,json ,main_table_name):
             attr_dict = {'__tablename__': rest_tables.capitalize(), 'id': Column(Integer, primary_key=True)}
             create_classes[rest_tables] = type('%s' % rest_tables.capitalize(), (Bases,), attr_dict)
             print(create_classes, '\n', rest_tables, '\n')
-#        elif(isinstance(value, dict) and any((list, dict in types))):
-#            if (same_type(value.values()) and len (value.values()) > 1  ):
+        elif(isinstance(value, dict) and any((list, dict in types))):
+            if (len(types) == 1 and types[0] is list ):
+                for k,v in value.items():
+                    rest_tables = str(key)+'__'+str(k)
+                    attr_dict = {'__tablename__': rest_tables.capitalize(), 'id': Column(Integer, primary_key=True)}
+                    create_classes[rest_tables] = type('%s' % rest_tables.capitalize(), (Bases,), attr_dict)
+                    print(create_classes, '\n', rest_tables, '\n')
+            else :
+                rest_tables = str(key)
+                attr_dict = {'__tablename__': rest_tables.capitalize(), 'id': Column(Integer, primary_key=True)}
+                create_classes[rest_tables] = type('%s' % rest_tables.capitalize(), (Bases,), attr_dict)
+                print(create_classes, '\n', rest_tables, '\n')
+                    
                 
 
     data.update(create_classes)
     
-for key, value in u.items():
-    print('adhasjkhdashdasl!!!!!!!!!', value, type(value), same_type(value))
-    types = same_type(value)
-    ll = {}
-    if isinstance(types, type):
+    
+underline = '\33[4m' 
+blue = '\x1b[6;30;46m' 
+pink =   '\x1b[7;33;40m'            
+end  =    '\x1b[0m'        
 
-        ll.update({key:types})
+print('<><><><><><><>START<><><><><><><><><><>')                
+for key, value in u.items():
+    print(underline +  str(key) + end ,blue + str(value) + end, '\x1b[6;30;42m' + str(type(value))+end, pink + str(same_type(value)) + end)
+
+    types = same_type(value)
+    lld = {}
+    ll = []
+    if isinstance(types, type):
+        ll.append(types)
+        lld.update({key:types})
         types = ll
     else:
         types = types
+    if (isinstance(value, list) ): 
+        print('list --- ', key,'ll = ' + str(ll),'types = '+ str(types))
+    elif(isinstance(value, dict) ):
+        if (len(types) == 1 and types[0] is list ):
+            print('HERE IT IS ')
+        else:
+            pass
+        print('dict --- ', key,'ll = ' + str(ll),'types = '+ str(types))
+    print('<><><><><><><>END<><><><><><><><><><>')
+    print('                                  ')
+    print('                                  ')    
+    print('                                  ')    
+    print('<><><><><><><>START<><><><><><><><><><>')
+
+def main_table_dict(data,json):
+    types={"<class 'str'>":"String","<class 'int'>":"Integer"}
+    obj = set(data) - set(json)
+    b = list()
+    for k in data.keys():
+    
+        a = list(k.split('__'))
+        if len(a) > 1:
+
+                b.append(k)
+    d= b            
+    for i in b:
+        obj.remove(i)
+    obj =  data.get(list(obj)[0])
+
+    backpop =obj.__name__.lower()
+    val_cols = list(set(json) - set(data))#Columns
+
+    cols = {}
+
+    b = set()
+    for k in data.keys():
+    
+        a = list(k.split('__'))
+        if len(a) > 1:
+
+            b.add(a[0])
+    c = list(b)
+    val_cols = [x for x in val_cols if x not in c]
+    for i in val_cols:
+        cols.update({i:types[str(type(i))]})
+
+    val_rels = list((set(json) - set(val_cols)- set(c)) ^ set(d))
+#    val_rels.append(d)
+    rels = {}
+    for i in val_rels:
+        print(backpop.lower())
+
+        rels.update({i:'mock'})
+
+    res =[{"table":obj,"cols":cols,"rels":rels}]
+    return res
