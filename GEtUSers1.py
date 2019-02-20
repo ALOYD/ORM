@@ -460,12 +460,17 @@ def main_table_dict(data,json):
     cols = {}
 
     b = set()
+    js_update = {}
     for k in data.keys():
-    
+    #js_update.update({k:[]})
         a = list(k.split('__'))
         if len(a) > 1:
-
+            if a[0] in js_update:
+                js_update[a[0]].append(k)
+            else:
+                js_update[a[0]] = [k]
             b.add(a[0])
+
     c = list(b)
     val_cols = [x for x in val_cols if x not in c]
     for i in val_cols:
@@ -481,3 +486,20 @@ def main_table_dict(data,json):
 
     res =[{"table":obj,"cols":cols,"rels":rels}]
     return res
+    
+    
+    
+    
+b = set()
+js_update = {}
+for k,v in data.items():
+    #js_update.update({k:[]})
+    a = list(k.split('__'))
+    if len(a) > 1:
+        if a[0] in js_update:
+            js_update[a[0]].append({k:json[a[0]][a[1]]})
+        else:
+            js_update[a[0]] = [k]
+        b.add(a[0])
+
+c = list(b)    
