@@ -122,13 +122,22 @@ class Inthago_dev(object):
 
         print('val_cols is ',val_cols)
         b = set()
+        js_update = {}
         for k in self.data.keys():
 
             a = list(k.split('__'))
             if len(a) > 1:
+                if a[0] in js_update:
+                    #                js_update[a[0]].append(k)
+                    js_update[a[0]].append({k: self.json[a[0]][a[1]]})
+                else:
+                    #                js_update[a[0]] = [k]
+                    js_update[a[0]] = [{k: self.json[a[0]][a[1]]}]
                 b.add(a[0])
         print('b set is ',b)
         c = list(b)
+
+
         print('c is ')
         val_cols = [x for x in val_cols if x not in c]
         print('val_cols without c is ', val_cols)
@@ -147,7 +156,13 @@ class Inthago_dev(object):
             rels.update({i:'mock'})
         #rels.append(i)
     #res = [{obj:vals}]
-        res =[{"table":obj,"cols":cols,"rels":rels}]
+        res ={"table":obj,"cols":cols,"rels":rels}
+
+
+        for k, v in js_update.items():
+            del u[k]
+            for i in v:
+                u.update(i)
         return res
 
     def create_tables(self):
@@ -293,7 +308,8 @@ f.close()
 ad = Inthago_dev(u)
 tdicts = ad.create_tables_dict('User')
 t = ad.create_tables()
-w = ad.main_table_dict()
+w = list()
+w.append( ad.main_table_dict())
 m = ad.merges()
 w[0].update({'data':ad.data,'json':ad.json})
 
@@ -466,12 +482,15 @@ def main_table_dict(data,json):
         a = list(k.split('__'))
         if len(a) > 1:
             if a[0] in js_update:
-                js_update[a[0]].append(k)
+#                js_update[a[0]].append(k)
+                js_update[a[0]].append({k:u[a[0]][a[1]]})
             else:
-                js_update[a[0]] = [k]
+#                js_update[a[0]] = [k]
+                js_update[a[0]] = [{k:u[a[0]][a[1]]}]
             b.add(a[0])
 
     c = list(b)
+
     val_cols = [x for x in val_cols if x not in c]
     for i in val_cols:
         cols.update({i:types[str(type(i))]})
@@ -485,21 +504,26 @@ def main_table_dict(data,json):
         rels.update({i:'mock'})
 
     res =[{"table":obj,"cols":cols,"rels":rels}]
+    for k,v in js_update.items():
+        del u[k]
+        for i in v:
+            u.update(i)
     return res
     
-    
-    
-    
-b = set()
-js_update = {}
-for k,v in data.items():
-    #js_update.update({k:[]})
-    a = list(k.split('__'))
-    if len(a) > 1:
-        if a[0] in js_update:
-            js_update[a[0]].append({k:json[a[0]][a[1]]})
-        else:
-            js_update[a[0]] = [k]
-        b.add(a[0])
-
-c = list(b)    
+#data_test = {}    
+#create_tables_dict(data_test,u,'USIK_PAY_ATTENTION')    
+#data = data_test   
+#ww = main_table_dict(data,u)
+##b = set()
+##js_update = {}
+##for k,v in data.items():
+##    #js_update.update({k:[]})
+##    a = list(k.split('__'))
+##    if len(a) > 1:
+##        if a[0] in js_update:
+##            js_update[a[0]].append({k:json[a[0]][a[1]]})
+##        else:
+##            js_update[a[0]] = [{k:json[a[0]][a[1]]}]
+##        b.add(a[0])
+##
+##c = list(b)    
