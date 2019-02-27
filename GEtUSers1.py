@@ -300,6 +300,7 @@ f = open('u.json')
 
 u = json.loads(f.read())
 f.close()
+u.update({'orders_dist_stats_budik': {'acc_budik': -107.15, 'avg_budik': 55.47, 'var_budik': 53.58}})
 #uu = u['contacts_deleted']
 #ad = Inthago_dev(uu)
 #tdicts = ad.create_tables_dict('Contacts_Deleted')
@@ -313,7 +314,7 @@ w.append( ad.main_table_dict())
 m = ad.merges()
 w[0].update({'data':ad.data,'json':ad.json})
 
-for i in w:
+for n,i in enumerate(w):
     for key,attr in i['cols'].items():
         print("trying to set col "+str(key)+" of table "+str(i['table'])+" with attr "+str(attr))
         setattr(i['table'],str(key),Column(attr))
@@ -326,10 +327,13 @@ for i in w:
        setattr(i['data'][key],str(i['table'].__name__.lower())+'_id',  Column(Integer, ForeignKey(str(i['table'].__name__.capitalize())+'.id'), nullable=False))
 
        if isinstance(i['json'][key],dict):
+           child_json = i['json'][key]
            nad = Inthago_dev(i['json'][key])
            nad.create_tables_dict(str(key.capitalize()))
            nad.create_tables()
+           child_data = nad.data
            w.append(nad.main_table_dict())
+           w[n+1].update({'data':child_data,'json':child_json})
 
 #
 # def main_table_dict(data,json):
