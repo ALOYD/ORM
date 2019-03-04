@@ -318,7 +318,15 @@ f.close()
 u.update({'orders_dist_stats_budik': {'acc_budik': -107.15
                                       , 'this_will_burn':{'ouch':1,'ohhhh':2}
                                       , 'avg_budik': 55.47
-                                      , 'var_budik': 53.58}})
+                                      , 'var_budik': 53.58},
+"new_chalange" : {'what':1
+                  ,'about': 2
+                  ,"to":'see'
+                  ,'iff':['there','will','be','list_object','inside','2','level','dict_object',',hah','?']
+                        , 'AND_EVEN_MORE':{'if_there_will_be':'more_than_one_dict_object', 'what_will_you_do' :{'run':'panic','brave':'yourself'}}
+                  }
+                                      
+                                      })
 #uu = u['contacts_deleted']
 #ad = Inthago_dev(uu)
 #tdicts = ad.create_tables_dict('Contacts_Deleted')
